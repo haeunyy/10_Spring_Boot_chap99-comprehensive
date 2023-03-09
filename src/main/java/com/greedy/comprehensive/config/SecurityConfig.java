@@ -10,8 +10,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.greedy.comprehensive.member.service.AuthenticationService;
+
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	private final AuthenticationService authenticationService;
+	
+	public SecurityConfig(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
+	}
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -44,6 +52,17 @@ public class SecurityConfig {
     			.and()
     				.build();
     }
+	
+	@Bean
+	public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+		
+		return http.getSharedObject(AuthenticationManagerBuilder.class)
+				.userDetailsService(authenticationService)
+				.passwordEncoder(passwordEncoder())
+				.and()
+				.build();
+		
+	}
 	
 
 }
